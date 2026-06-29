@@ -116,7 +116,7 @@ def obtener_info(datos: DescargarRequest):
 
         raise HTTPException(
             status_code=400,
-            detail="Amor, no pude obtener la información de esta canción. Intenta con otro enlace."
+            detail=f"DEBUG: {error}"
         )
 
 
