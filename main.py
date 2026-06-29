@@ -18,9 +18,17 @@ CARPETA_DESCARGAS = "descargas"
 if platform.system() == "Windows":
     FFMPEG_LOCATION = os.path.join(os.getcwd(), "ffmpeg", "bin")
     COOKIE_FILE = "cookies.txt"
+
 else:
+    import shutil
+
     FFMPEG_LOCATION = "/usr/bin"
-    COOKIE_FILE = "/etc/secrets/cookies.txt"
+
+    SECRET_COOKIE_FILE = "/etc/secrets/cookies.txt"
+    COOKIE_FILE = "/tmp/cookies.txt"
+
+    if os.path.exists(SECRET_COOKIE_FILE):
+        shutil.copyfile(SECRET_COOKIE_FILE, COOKIE_FILE)
 
 os.makedirs(CARPETA_DESCARGAS, exist_ok=True)
 
