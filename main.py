@@ -17,8 +17,10 @@ CARPETA_DESCARGAS = "descargas"
 
 if platform.system() == "Windows":
     FFMPEG_LOCATION = os.path.join(os.getcwd(), "ffmpeg", "bin")
+    COOKIE_FILE = "cookies.txt"
 else:
     FFMPEG_LOCATION = "/usr/bin"
+    COOKIE_FILE = "/etc/secrets/cookies.txt"
 
 os.makedirs(CARPETA_DESCARGAS, exist_ok=True)
 
@@ -49,6 +51,21 @@ def limpiar_nombre_archivo(nombre: str) -> str:
     return nombre.strip() or "cancion_para_ti"
 
 
+def opciones_base(skip_download: bool = True):
+    opciones = {
+        "quiet": True,
+        "noplaylist": True,
+    }
+
+    if skip_download:
+        opciones["skip_download"] = True
+
+    if os.path.exists(COOKIE_FILE):
+        opciones["cookiefile"] = COOKIE_FILE
+
+    return opciones
+
+
 @app.get("/")
 def inicio():
     return {
@@ -75,11 +92,7 @@ def obtener_info(datos: DescargarRequest):
 
     url_limpia = limpiar_url_youtube(datos.url)
 
-    opciones = {
-        "quiet": True,
-        "skip_download": True,
-        "noplaylist": True
-    }
+    opciones = opciones_base(skip_download=True)
 
     try:
         with YoutubeDL(opciones) as ydl:
@@ -98,7 +111,7 @@ def obtener_info(datos: DescargarRequest):
         if "Sign in to confirm" in error:
             raise HTTPException(
                 status_code=400,
-                detail="Amor, YouTube bloqueó este enlace desde el servidor. Prueba con otro enlace."
+                detail="Amor, YouTube bloqueó este enlace desde el servidor. La sesión necesita renovarse."
             )
 
         raise HTTPException(
@@ -119,18 +132,16 @@ def descargar(datos: DescargarRequest):
     try:
         url_limpia = limpiar_url_youtube(datos.url)
 
-        with YoutubeDL({
-            "quiet": True,
-            "skip_download": True,
-            "noplaylist": True
-        }) as ydl:
+        opciones_info = opciones_base(skip_download=True)
+
+        with YoutubeDL(opciones_info) as ydl:
             info = ydl.extract_info(url_limpia, download=False)
 
         titulo = limpiar_nombre_archivo(info.get("title", "cancion_para_ti"))
 
-        opciones = {
-            "quiet": True,
-            "noplaylist": True,
+        opciones_descarga = opciones_base(skip_download=False)
+
+        opciones_descarga.update({
             "format": "bestaudio/best",
             "ffmpeg_location": FFMPEG_LOCATION,
             "outtmpl": os.path.join(
@@ -142,9 +153,9 @@ def descargar(datos: DescargarRequest):
                 "preferredcodec": "mp3",
                 "preferredquality": "192"
             }]
-        }
+        })
 
-        with YoutubeDL(opciones) as ydl:
+        with YoutubeDL(opciones_descarga) as ydl:
             ydl.download([url_limpia])
 
         archivo = os.path.join(
@@ -173,7 +184,7 @@ def descargar(datos: DescargarRequest):
         if "Sign in to confirm" in error:
             raise HTTPException(
                 status_code=400,
-                detail="Amor, YouTube bloqueó este enlace desde el servidor. Prueba con otro enlace."
+                detail="Amor, YouTube bloqueó este enlace desde el servidor. La sesión necesita renovarse."
             )
 
         raise HTTPException(
