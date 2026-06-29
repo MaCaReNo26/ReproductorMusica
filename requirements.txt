@@ -1,4 +1,4 @@
-fastapi
-uvicorn
-yt-dlp
-python-multipart
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+yt-dlp==2026.06.09
+python-multipart==0.0.20
