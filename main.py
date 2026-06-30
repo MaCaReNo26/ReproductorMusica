@@ -180,6 +180,25 @@ def descargar(datos: DescargarRequest):
             }]
         })
 
+        formatos = info.get("formats", [])
+
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "total_formatos": len(formatos),
+                "formatos": [
+                    {
+                        "format_id": f.get("format_id"),
+                        "ext": f.get("ext"),
+                        "acodec": f.get("acodec"),
+                        "vcodec": f.get("vcodec"),
+                        "url": bool(f.get("url"))
+                    }
+                    for f in formatos[:10]
+                ]
+            }
+        )
+
         with YoutubeDL(opciones_descarga) as ydl:
             ydl.download([url_limpia])
 
