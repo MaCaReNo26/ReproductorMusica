@@ -153,10 +153,21 @@ def descargar(datos: DescargarRequest):
 
         titulo = limpiar_nombre_archivo(info.get("title", "cancion_para_ti"))
 
-        opciones_descarga = opciones_base(skip_download=False)
+        opciones_descarga = {
+            "quiet": True,
+            "noplaylist": True,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android"]
+                }
+            }
+        }
+
+        if os.path.exists(COOKIE_FILE):
+            opciones_descarga["cookiefile"] = COOKIE_FILE
 
         opciones_descarga.update({
-            "format": "bestaudio[ext=m4a]/bestaudio/best",
+            "format": "bestaudio/best",
             "ffmpeg_location": FFMPEG_LOCATION,
             "outtmpl": os.path.join(
                 CARPETA_DESCARGAS,
