@@ -65,13 +65,14 @@ def opciones_base(skip_download: bool = True):
         "noplaylist": True,
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "web"]
+                "player_client": ["web"]
             }
         }
     }
 
     if skip_download:
         opciones["skip_download"] = True
+        opciones["ignore_no_formats_error"] = True
 
     if os.path.exists(COOKIE_FILE):
         opciones["cookiefile"] = COOKIE_FILE
@@ -155,7 +156,7 @@ def descargar(datos: DescargarRequest):
         opciones_descarga = opciones_base(skip_download=False)
 
         opciones_descarga.update({
-            "format": "ba[ext=m4a]/ba/best",
+            "format": "bestaudio[ext=m4a]/bestaudio/best",
             "ffmpeg_location": FFMPEG_LOCATION,
             "outtmpl": os.path.join(
                 CARPETA_DESCARGAS,
