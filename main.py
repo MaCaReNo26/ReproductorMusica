@@ -63,6 +63,11 @@ def opciones_base(skip_download: bool = True):
     opciones = {
         "quiet": True,
         "noplaylist": True,
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "web"]
+            }
+        }
     }
 
     if skip_download:
@@ -150,7 +155,7 @@ def descargar(datos: DescargarRequest):
         opciones_descarga = opciones_base(skip_download=False)
 
         opciones_descarga.update({
-            "format": "bestaudio/best",
+            "format": "ba[ext=m4a]/ba/best",
             "ffmpeg_location": FFMPEG_LOCATION,
             "outtmpl": os.path.join(
                 CARPETA_DESCARGAS,
