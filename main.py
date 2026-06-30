@@ -203,5 +203,5 @@ def descargar(datos: DescargarRequest):
 
         raise HTTPException(
             status_code=500,
-            detail="Amor, ocurrió un problema al descargar la canción. Intenta con otro enlace."
+            detail=f"DEBUG DESCARGA: {error}"
         )
